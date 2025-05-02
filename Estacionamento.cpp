@@ -50,8 +50,10 @@ int main()
 	int op, pos;
 	list<Carro> estacionamento, est_aux1;
 	vector<bool> vagas(11,false);
+	ofstream historico;
 	do
 	{
+		historico.open("historico.txt");
 		system("cls");
 		cout << "\n==========================================================================================================";
 		cout << "\n\t\tEstacionamento";
@@ -67,6 +69,7 @@ int main()
 		cout << "\n==========================================================================================================";
 		cout << "\nDigite a sua opcao -> [ ] \b\b\b";
 		cin >> op;
+		historico << "\nOpcao " << op << " selecionada ";
 		switch (op)
 		{
 			case 1:
@@ -78,6 +81,7 @@ int main()
 					cout << "\n==========================================================================================================";
 					temp.set_dados();
 					ent_aux1.push(temp);
+					historico << "\nInserido carro " << temp.ret_placa() << " " << temp.ret_tipo() << " na fila de entrada ";
 					cout << "\nDeseja inserir outro carro na fila de entrada? (sim/nao) ";
 					getline(cin>>ws,resp);
 				}while (resp=="sim");
@@ -87,6 +91,7 @@ int main()
 					{
 						entrada.push(ent_aux1.front());
 						ent_aux1.pop();
+						historico << "\nCarro de emergencia priorizado ";
 					}
 					else 
 					{
@@ -100,6 +105,7 @@ int main()
 					{
 						entrada.push(ent_aux2.front());
 						ent_aux2.pop();
+						historico << "\nCarro prioritario priorizado ";
 					}
 					else 
 					{
@@ -112,7 +118,7 @@ int main()
 					entrada.push(ent_aux1.front());
 					ent_aux1.pop();
 				}
-				cout << "\Carro inserido na fila de entrada! ";
+				cout << "\nCarro inserido na fila de entrada! ";
 			break;
 			case 2:
 				do
@@ -133,6 +139,7 @@ int main()
 						{
 							cout << "\nSem carros na fila para estacionar \n ";
 							resp = "nao";
+							historico << "\nSem carros para estacionar ";
 						}
 						else
 						{
@@ -144,16 +151,21 @@ int main()
 								{
 							        vagas[pos] = true;
 							        estacionamento.push_back(entrada.front());
+							        historico << "\nInserido carro " << entrada.front().ret_placa() << " na vaga " << pos;
 							        entrada.pop();
 							        cout << "\nCarro estacionado na vaga " << pos << " com sucesso!\n";
 							    }
 								else 
 								{
 							        cout << "\nVaga ocupada!\n";
+							        historico << "\nVaga digitada ocupada ";
 							    }
 							}
 							else
+							{
 						    	cout << "\nVaga invalida!\n";
+						    	historico << "\Vaga digitada invalida ";
+						    }
 						cout << "\nDeseja inserir outro carro no estacionamento? (sim/nao) ";
 						getline(cin>>ws,resp);
 						}
@@ -189,6 +201,7 @@ int main()
 					ent_aux1.front().print_dados();
 					ent_aux1.pop();
 				}
+				historico << "\nLista de carros na fila de entrada impressa ";
 			break;
 			case 5:
 				system("cls");
@@ -201,6 +214,7 @@ int main()
 					est_aux1.front().print_dados();
 					est_aux1.pop_front();
 				}
+				historico << "\nLista de carros no estacionamento impressa ";
 			break;
 			case 6:
 				system("cls");
@@ -213,8 +227,11 @@ int main()
 					sai_aux1.front().print_dados();
 					sai_aux1.pop_front();
 				}
+				historico << "\nLista de carros na fila de saida impressa ";
 			break;
 			case 7:
+				historico << "\nPrograma finalizado ";
+				historico.close();
 				exit(0);
 			break;
 			default:
@@ -222,10 +239,12 @@ int main()
 				cout << "\n==========================================================================================================";
 				cout << "\n\t\tOPCAO INVALIDA!!!! ";
 				cout << "\n==========================================================================================================";
+				historico << "\nOpcao invalida digitada no menu ";
 	      	break;
 		}
 	cout << "\nDeseja voltar para o menu principal? (sim/nao) ";
     cin >> resp;
-    }while(resp == "sim");  
+    }while(resp == "sim"); 
+	historico.close(); 
 	return 0;
 }
