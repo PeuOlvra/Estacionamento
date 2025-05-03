@@ -5,6 +5,7 @@
 #include<deque>
 #include<list>
 #include<fstream>
+#include<map> 
 using namespace std;
 
 class Carro
@@ -51,9 +52,10 @@ int main()
 	list<Carro> estacionamento, est_aux1;
 	vector<bool> vagas(11,false);
 	ofstream historico;
+	map<string,int> placa_vaga;
+	historico.open("historico.txt");
 	do
 	{
-		historico.open("historico.txt");
 		system("cls");
 		cout << "\n==========================================================================================================";
 		cout << "\n\t\tEstacionamento";
@@ -82,6 +84,7 @@ int main()
 					temp.set_dados();
 					ent_aux1.push(temp);
 					historico << "\nInserido carro " << temp.ret_placa() << " " << temp.ret_tipo() << " na fila de entrada ";
+					cout << "\nCarro inserido na fila de entrada!\n ";
 					cout << "\nDeseja inserir outro carro na fila de entrada? (sim/nao) ";
 					getline(cin>>ws,resp);
 				}while (resp=="sim");
@@ -118,7 +121,6 @@ int main()
 					entrada.push(ent_aux1.front());
 					ent_aux1.pop();
 				}
-				cout << "\nCarro inserido na fila de entrada! ";
 			break;
 			case 2:
 				do
@@ -149,10 +151,12 @@ int main()
 							{
 							    if (!vagas[pos]) 
 								{
-							        vagas[pos] = true;
-							        estacionamento.push_back(entrada.front());
-							        historico << "\nInserido carro " << entrada.front().ret_placa() << " na vaga " << pos;
-							        entrada.pop();
+									vagas[pos] = true;
+									temp = entrada.front();
+									historico << "\nInserido carro " << entrada.front().ret_placa() << " na vaga " << pos;
+									entrada.pop();
+									estacionamento.push_back(temp);
+									placa_vaga[temp.ret_placa()] = pos;  
 							        cout << "\nCarro estacionado na vaga " << pos << " com sucesso!\n";
 							    }
 								else 
@@ -164,32 +168,59 @@ int main()
 							else
 							{
 						    	cout << "\nVaga invalida!\n";
-						    	historico << "\Vaga digitada invalida ";
+						    	historico << "\nVaga digitada invalida ";
 						    }
 						cout << "\nDeseja inserir outro carro no estacionamento? (sim/nao) ";
 						getline(cin>>ws,resp);
 						}
 					}while (resp=="sim");
 			break;
-			case 3: /*
-				do
-				{
-					system("cls");
-					cout << "\n==========================================================================================================";
-					cout << "\n\t\tEstacionamento - INSERIR CARRO NA FILA DE SAIDA ";
-					cout << "\n==========================================================================================================";
-					cout << "\nDigite a placa do carro que deseja inserir na fila de saida: ";
-					getline(cin>>ws, consulta);
-					cout << "\nDeseja sair pela frente ou por tras? ";
-					getline(cin>>ws, portao);
-					if (portao == "frente")
+			case 3: 
+			    do {
+			        system("cls");
+			        cout << "\n==========================================================================================================";
+			        cout << "\n\t\tEstacionamento - INSERIR CARRO NA FILA DE SAIDA ";
+			        cout << "\n==========================================================================================================";
+			        cout << "\nDigite a placa do carro que deseja inserir na fila de saida: ";
+			        getline(cin >> ws, consulta);
+			        cout << "\nDeseja sair pela frente ou por tras? ";
+			        getline(cin >> ws, portao);
+			        map<string, int>::iterator it_vaga = placa_vaga.find(consulta);
+					if (it_vaga == placa_vaga.end())
 					{
-						saida.push_front(estacionamento.)
+					    cout << "\nCarro com placa " << consulta << " nao encontrado no estacionamento \n";
+					    historico << "\nPlaca digtada nao encontrada no estacionamento ";
+					} 
+					else 
+					{
+					    bool encontrado = false;
+					    for (list<Carro>::iterator it = estacionamento.begin(); it != estacionamento.end(); ++it) 
+					    {
+					        if (it->ret_placa() == consulta) 
+					        {
+					            if (portao == "frente") 
+					            {
+					                saida.push_front(*it);
+					            } 
+					            else 
+					            {
+					                saida.push_back(*it);
+					            }
+					            historico << "\nInserido carro " << consulta << " na fila de saida ";
+					            estacionamento.erase(it);
+					            int vaga = it_vaga->second;
+					            vagas[vaga] = false; 
+					            placa_vaga.erase(it_vaga); 
+					            cout << "\nCarro com placa " << consulta << " movido para fila de saída \n";
+					            encontrado = true;
+					            break;
+					        }
+					    }
 					}
-					cout << "\Deseja inserir outro carro na fila de saida? (sim/nao) ";
-					getline(cin>>ws,resp);
-				}while (resp=="sim"); */
-			break;
+			        cout << "\nDeseja inserir outro carro na fila de saida? (sim/nao) ";
+			        getline(cin >> ws, resp);
+			    }while (resp=="sim");
+			break; 
 			case 4:
 				system("cls");
 				cout << "\n==========================================================================================================";
